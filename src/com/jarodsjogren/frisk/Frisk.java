@@ -1,7 +1,6 @@
 package com.jarodsjogren.frisk;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.bukkit.Bukkit;
@@ -34,12 +33,12 @@ public class Frisk extends JavaPlugin implements Listener{
 		Bukkit.getServer().getPluginManager().registerEvents(this, this); //Registering all events for the plugin
 		this.saveDefaultConfig(); //Saving el config
 		PluginManager pm = Bukkit.getPluginManager();
-       		Permission p1 = new Permission("frisk.bypass");
-        	Permission p2 = new Permission("frisk.frisk");
-        	Permission p3 = new Permission("frisk.health");
-        	pm.addPermission(p1);
-        	pm.addPermission(p2);
-        	pm.addPermission(p3);
+		Permission p1 = new Permission("frisk.bypass");
+		Permission p2 = new Permission("frisk.frisk");
+		Permission p3 = new Permission("frisk.health");
+		pm.addPermission(p1);
+		pm.addPermission(p2);
+		pm.addPermission(p3);
 
 	}
 
@@ -50,7 +49,7 @@ public class Frisk extends JavaPlugin implements Listener{
 		getLogger().info("[Frisk]: Created by TheBeyonder");
 		getLogger().info("[Frisk]: Thanks for using my plugin!");
 	}
-	
+
 	@SuppressWarnings("deprecation")
 	@EventHandler
 	public void welcome2Server(PlayerJoinEvent e)
@@ -61,7 +60,7 @@ public class Frisk extends JavaPlugin implements Listener{
 			e.getPlayer().setMaxHealth(40);
 			e.getPlayer().setHealth(40);
 		}
-		
+
 		//Added in-case a guard gets demoted (Don't want them to have 40 health anymore)
 		if (!e.getPlayer().hasPermission("frisk.health") && e.getPlayer().getMaxHealth() == 40)
 		{
@@ -80,7 +79,7 @@ public class Frisk extends JavaPlugin implements Listener{
 		if (prisoner instanceof Player)
 		{
 			if (guard.getItemInHand().equals(new ItemStack(Material.STICK, 1))
-			    && guard.hasPermission("frisk.frisk")) //Makes sure regular joes can't frisk
+					&& guard.hasPermission("frisk.frisk")) //Makes sure regular joes can't frisk
 			{
 				if (!cd.hasCooldown(guard)) { //Path if they're not on cooldown
 					List<String> contra = getConfig().getStringList("contraband"); //Gets contraband IDs from config
@@ -113,7 +112,7 @@ public class Frisk extends JavaPlugin implements Listener{
 						cd.setCooldown(guard, 20000);
 					} else
 						guard.sendMessage(prefix + " Cooldown bypassed.");
-						
+
 				} else {
 					guard.sendMessage(prefix + " You can't frisk a prisoner for " + cd.getCooldown(guard) + " seconds!");
 					guard.damage(4); //They were bad.
@@ -124,6 +123,8 @@ public class Frisk extends JavaPlugin implements Listener{
 		}
 	}
 
+
+	@SuppressWarnings("deprecation")
 	@EventHandler
 	public void sweetReleaseOfDeath(PlayerDeathEvent e)
 	{
@@ -132,13 +133,12 @@ public class Frisk extends JavaPlugin implements Listener{
 		List<ItemStack> nonContra = new ArrayList<ItemStack>(); //Preemptively creating a list for non-contraband
 		Player guard = e.getEntity();
 		boolean isContraband;
-		
+
 		if (e.getEntity() instanceof Player) //Making sure it's not a dog
 		{
 			if (guard.hasPermission("frisk.frisk")) //Do they have permission?
 			{
-				Iterator<ItemStack> iter = e.getDrops().iterator(); //So we can iterate
-				 
+
 				for (ItemStack is : drops)
 				{
 					isContraband = false;
@@ -155,7 +155,7 @@ public class Frisk extends JavaPlugin implements Listener{
 						nonContra.add(is);
 					}
 				}
-				
+
 				for (ItemStack is : nonContra)
 				{
 					if (drops.contains(is))
@@ -168,8 +168,8 @@ public class Frisk extends JavaPlugin implements Listener{
 			}
 		}
 	}
-	
-	
+
+
 	public static ItemStack[] removeInventoryItems(PlayerInventory pinv, PlayerInventory ginv, Material type) {
 		ArrayList<ItemStack> guardInv = new ArrayList<ItemStack>();
 		for (ItemStack is : pinv.getContents()) {
@@ -180,6 +180,6 @@ public class Frisk extends JavaPlugin implements Listener{
 		}
 		return guardInv.toArray(new ItemStack[guardInv.size()]); //Return list of items to give to guard
 	}
-	
+
 
 }
