@@ -1,0 +1,6 @@
+# You'll use the item ID's as they are provided here:
+# https://www.digminecraft.com/lists/item_id_list_pc_1_8.php
+contraband:
+  - '81'
+  - '338'
+  - '353'
