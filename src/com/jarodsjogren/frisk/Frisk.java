@@ -21,25 +21,25 @@ import org.bukkit.plugin.java.JavaPlugin;
 import net.md_5.bungee.api.ChatColor;
 
 public class Frisk extends JavaPlugin implements Listener{
-	Cooldowns cd = new Cooldowns();
-	final int seconds = 20;
+	Cooldowns cd = new Cooldowns(); //Instance of cooldowns.java
+	final int seconds = 20; //Cooldown time
 	private final String prefix = ChatColor.DARK_GRAY + "[" + ChatColor.GOLD + "Frisk" + ChatColor.DARK_GRAY + "]" + ChatColor.GOLD;
 
 	@Override
 	public void onEnable()
 	{
+		//Giving credit where credit is due.
 		getLogger().info("[Frisk]: Enabled");
 		getLogger().info("[Frisk]: Created by TheBeyonder");
-		Bukkit.getServer().getPluginManager().registerEvents(
-				this, this);
-		this.saveDefaultConfig();
+		Bukkit.getServer().getPluginManager().registerEvents(this, this); //Registering all events for the plugin
+		this.saveDefaultConfig(); //Saving el config
 		PluginManager pm = Bukkit.getPluginManager();
-        Permission p1 = new Permission("frisk.bypass");
-        Permission p2 = new Permission("frisk.frisk");
-        Permission p3 = new Permission("frisk.health");
-        pm.addPermission(p1);
-        pm.addPermission(p2);
-        pm.addPermission(p3);
+       		Permission p1 = new Permission("frisk.bypass");
+        	Permission p2 = new Permission("frisk.frisk");
+        	Permission p3 = new Permission("frisk.health");
+        	pm.addPermission(p1);
+        	pm.addPermission(p2);
+        	pm.addPermission(p3);
 
 	}
 
@@ -55,12 +55,14 @@ public class Frisk extends JavaPlugin implements Listener{
 	@EventHandler
 	public void welcome2Server(PlayerJoinEvent e)
 	{
+		//Gives guards 40 health
 		if (e.getPlayer().hasPermission("frisk.health"))
 		{
 			e.getPlayer().setMaxHealth(40);
 			e.getPlayer().setHealth(40);
 		}
 		
+		//Added in-case a guard gets demoted (Don't want them to have 40 health anymore)
 		if (!e.getPlayer().hasPermission("frisk.health") && e.getPlayer().getMaxHealth() == 40)
 		{
 			e.getPlayer().setMaxHealth(20);
@@ -73,27 +75,25 @@ public class Frisk extends JavaPlugin implements Listener{
 	public void touchyTouchy(PlayerInteractEntityEvent e)
 	{
 		boolean playerGuilty = false;
-		Player guard = e.getPlayer();
-		Player prisoner = (Player)e.getRightClicked();
+		Player guard = e.getPlayer(); //Player who right-clicked with stick
+		Player prisoner = (Player)e.getRightClicked(); //Player who got right-clicked
 		if (prisoner instanceof Player)
 		{
 			if (guard.getItemInHand().equals(new ItemStack(Material.STICK, 1))
-					&& guard.hasPermission("frisk.frisk"))
+			    && guard.hasPermission("frisk.frisk")) //Makes sure regular joes can't frisk
 			{
-				if (!cd.hasCooldown(guard)) {
-					List<String> contra = getConfig().getStringList("contraband");
-					Integer size = contra.size();
-					PlayerInventory pris = prisoner.getInventory();
+				if (!cd.hasCooldown(guard)) { //Path if they're not on cooldown
+					List<String> contra = getConfig().getStringList("contraband"); //Gets contraband IDs from config
+					PlayerInventory pris = prisoner.getInventory(); //Gets an instance of the prisoner's inventory
 					for (int i = 0; i < contra.size(); i++) {
-						String key = contra.get(i);
-						Integer id = Integer.parseInt(key);
-						if (pris.contains(Material.getMaterial(id)))
+						Integer id = Integer.parseInt(contra.get(i)); //Only IDs should be stored in config
+						if (pris.contains(Material.getMaterial(id))) //Do they have contraband?
 						{
-							playerGuilty = true;
+							playerGuilty = true; //Yep they do have contraband.
 							ItemStack[] guardInv = removeInventoryItems(pris, guard.getInventory(), Material.getMaterial(id));
 							for (ItemStack is : guardInv)
 							{
-								guard.getInventory().addItem(is);
+								guard.getInventory().addItem(is); //Putting contraband into guard's inventory
 							}
 						}
 					}
@@ -116,7 +116,7 @@ public class Frisk extends JavaPlugin implements Listener{
 						
 				} else {
 					guard.sendMessage(prefix + " You can't frisk a prisoner for " + cd.getCooldown(guard) + " seconds!");
-					guard.damage(4);
+					guard.damage(4); //They were bad.
 				}
 			} else {
 				return;
@@ -127,17 +127,17 @@ public class Frisk extends JavaPlugin implements Listener{
 	@EventHandler
 	public void sweetReleaseOfDeath(PlayerDeathEvent e)
 	{
-		List<String> contra = getConfig().getStringList("contraband");
-		List<ItemStack> drops = e.getDrops();
-		List<ItemStack> nonContra = new ArrayList<ItemStack>();
+		List<String> contra = getConfig().getStringList("contraband"); //List of contraband IDs from config
+		List<ItemStack> drops = e.getDrops(); //Items being dropped by players
+		List<ItemStack> nonContra = new ArrayList<ItemStack>(); //Preemptively creating a list for non-contraband
 		Player guard = e.getEntity();
 		boolean isContraband;
 		
-		if (e.getEntity() instanceof Player)
+		if (e.getEntity() instanceof Player) //Making sure it's not a dog
 		{
-			if (guard.hasPermission("frisk.frisk"))
+			if (guard.hasPermission("frisk.frisk")) //Do they have permission?
 			{
-				Iterator<ItemStack> iter = e.getDrops().iterator();
+				Iterator<ItemStack> iter = e.getDrops().iterator(); //So we can iterate
 				 
 				for (ItemStack is : drops)
 				{
@@ -145,12 +145,12 @@ public class Frisk extends JavaPlugin implements Listener{
 					for (int i = 0; i < contra.size(); i++) {
 						String key = contra.get(i);
 						Integer id = Integer.parseInt(key);
-						if (is.getTypeId() == id)
+						if (is.getTypeId() == id) //Marking item as contraband
 						{
 							isContraband = true;
 						}
 					}
-					if (isContraband == false)
+					if (isContraband == false) //IT'S CLEAN SO ADD IT TO THAT LIST FROM UP THERE! ^
 					{
 						nonContra.add(is);
 					}
@@ -160,7 +160,7 @@ public class Frisk extends JavaPlugin implements Listener{
 				{
 					if (drops.contains(is))
 					{
-						drops.remove(is);
+						drops.remove(is); //Removing non-contraband items from drop
 					}
 				}
 			} else {
@@ -174,11 +174,11 @@ public class Frisk extends JavaPlugin implements Listener{
 		ArrayList<ItemStack> guardInv = new ArrayList<ItemStack>();
 		for (ItemStack is : pinv.getContents()) {
 			if (is != null && is.getType() == type) {
-				pinv.remove(is);
-				guardInv.add(is);
+				pinv.remove(is); //Remove from player inventory
+				guardInv.add(is); //Add to list of items to give to guard
 			}
 		}
-		return guardInv.toArray(new ItemStack[guardInv.size()]);
+		return guardInv.toArray(new ItemStack[guardInv.size()]); //Return list of items to give to guard
 	}
 	
 
