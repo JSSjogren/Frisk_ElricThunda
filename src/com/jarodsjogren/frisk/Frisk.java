@@ -52,7 +52,7 @@ public class Frisk extends JavaPlugin implements Listener{
 
 	@SuppressWarnings("deprecation")
 	@EventHandler
-	public void welcome2Server(PlayerJoinEvent e)
+	public void welcomeToServer(PlayerJoinEvent e)
 	{
 		//Gives guards 40 health
 		if (e.getPlayer().hasPermission("frisk.health"))
@@ -71,7 +71,7 @@ public class Frisk extends JavaPlugin implements Listener{
 
 	@SuppressWarnings("deprecation")
 	@EventHandler
-	public void touchyTouchy(PlayerInteractEntityEvent e)
+	public void entityTouchEvent(PlayerInteractEntityEvent e)
 	{
 		boolean playerGuilty = false;
 		Player guard = e.getPlayer(); //Player who right-clicked with stick
@@ -126,7 +126,7 @@ public class Frisk extends JavaPlugin implements Listener{
 
 	@SuppressWarnings("deprecation")
 	@EventHandler
-	public void sweetReleaseOfDeath(PlayerDeathEvent e)
+	public void playerDeathEvent(PlayerDeathEvent e)
 	{
 		List<String> contra = getConfig().getStringList("contraband"); //List of contraband IDs from config
 		List<ItemStack> drops = e.getDrops(); //Items being dropped by players
